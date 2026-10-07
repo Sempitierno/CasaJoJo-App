@@ -6,13 +6,13 @@ plugins {
 android {
     namespace = "com.example.casajojo_app"
     compileSdk {
-        version = release(37)
+        version = release(33)
     }
 
     defaultConfig {
         applicationId = "com.example.casajojo_app"
-        minSdk = 26
-        targetSdk = 37
+        minSdk = 33
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fondo de la ventana mientras Compose dibuja la primera pantalla -->
+    <color name="ventana_fondo">#FFF2F5EC</color>
+    <!-- Verde "palta" de la marca (fondo del ícono) -->
+    <color name="ic_launcher_background">#FF2B6A3C</color>
+</resources>

@@ -9,6 +9,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import cl.lacasajojo.app.data.entity.DetallePedidoEntity
 import cl.lacasajojo.app.data.entity.EstadoPedido
+import cl.lacasajojo.app.data.entity.FotoCliente
 import cl.lacasajojo.app.data.entity.PedidoConDetalle
 import cl.lacasajojo.app.data.entity.PedidoEntity
 import kotlinx.coroutines.flow.Flow
@@ -41,6 +42,10 @@ abstract class PedidoDao {
     @Query("SELECT * FROM pedidos ORDER BY creadoEn DESC")
     abstract fun observarTodos(): Flow<List<PedidoConDetalle>>
 
+    /** Fotos de perfil de los usuarios que tienen una (el administrador las muestra junto a cada comanda). */
+    @Query("SELECT id AS clienteId, fotoPerfil FROM usuarios WHERE fotoPerfil IS NOT NULL")
+    abstract fun observarFotosClientes(): Flow<List<FotoCliente>>
+
     /** Solo los pedidos del cliente indicado, del más reciente al más antiguo. */
     @Transaction
     @Query("SELECT * FROM pedidos WHERE clienteId = :clienteId ORDER BY creadoEn DESC")
@@ -64,6 +69,10 @@ abstract class PedidoDao {
 
     @Query("UPDATE pedidos SET estadoNotificado = :estado WHERE id = :pedidoId")
     abstract suspend fun marcarEstadoNotificado(pedidoId: String, estado: EstadoPedido): Int
+
+    /** Guarda (o quita, con null) la foto del pedido. Devuelve las filas modificadas. */
+    @Query("UPDATE pedidos SET fotoPedido = :foto, actualizadoEn = :ahora WHERE id = :pedidoId")
+    abstract suspend fun actualizarFoto(pedidoId: String, foto: String?, ahora: Long): Int
 
     @Update
     abstract suspend fun actualizar(pedido: PedidoEntity)

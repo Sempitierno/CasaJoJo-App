@@ -40,7 +40,9 @@ data class PedidoEntity(
     val total: Int,
     val estado: EstadoPedido,
     val estadoNotificado: EstadoPedido,
-    val actualizadoEn: Long
+    val actualizadoEn: Long,
+    /** Nombre del archivo de la foto del pedido tomada por el administrador (null = sin foto). */
+    val fotoPedido: String? = null
 )
 
 /**
@@ -74,4 +76,10 @@ data class PedidoConDetalle(
     @Embedded val pedido: PedidoEntity,
     @Relation(parentColumn = "id", entityColumn = "pedidoId")
     val detalles: List<DetallePedidoEntity>
+)
+
+/** Foto de perfil de un cliente (solo los que tienen foto). Sirve para mostrarla en las comandas del administrador. */
+data class FotoCliente(
+    val clienteId: Long,
+    val fotoPerfil: String
 )

@@ -26,6 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cl.lacasajojo.app.data.entity.ProductoEntity
 import cl.lacasajojo.app.ui.components.EncabezadoCategoria
 import cl.lacasajojo.app.ui.components.EstadoVacio
+import cl.lacasajojo.app.ui.components.FotoMiniatura
 import cl.lacasajojo.app.ui.components.PantallaBase
 import cl.lacasajojo.app.ui.components.PantallaCargando
 import cl.lacasajojo.app.ui.components.TarjetaJoJo
@@ -105,6 +106,13 @@ private fun TarjetaProductoMenu(producto: ProductoEntity) {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.Top
         ) {
+            if (producto.fotoProducto != null) {
+                FotoMiniatura(
+                    nombreArchivo = producto.fotoProducto,
+                    contentDescription = "Foto de ${producto.nombre}",
+                    modifier = Modifier.alpha(transparencia)
+                )
+            }
             Column(
                 modifier = Modifier
                     .weight(1f)

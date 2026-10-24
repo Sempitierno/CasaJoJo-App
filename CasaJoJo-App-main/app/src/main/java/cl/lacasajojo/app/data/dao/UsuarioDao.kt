@@ -21,11 +21,15 @@ interface UsuarioDao {
     @Query("SELECT * FROM usuarios WHERE correo = :correo LIMIT 1")
     suspend fun buscarPorCorreo(correo: String): UsuarioEntity?
 
-    @Query("SELECT id, nombreCompleto, correo, rol FROM usuarios WHERE id = :id LIMIT 1")
+    @Query("SELECT id, nombreCompleto, correo, rol, fotoPerfil FROM usuarios WHERE id = :id LIMIT 1")
     fun observarPerfil(id: Long): Flow<PerfilUsuario?>
 
-    @Query("SELECT id, nombreCompleto, correo, rol FROM usuarios WHERE id = :id LIMIT 1")
+    @Query("SELECT id, nombreCompleto, correo, rol, fotoPerfil FROM usuarios WHERE id = :id LIMIT 1")
     suspend fun obtenerPerfil(id: Long): PerfilUsuario?
+
+    /** Guarda (o quita, con null) la foto de perfil. Devuelve las filas modificadas. */
+    @Query("UPDATE usuarios SET fotoPerfil = :foto WHERE id = :id")
+    suspend fun actualizarFotoPerfil(id: Long, foto: String?): Int
 
     @Query("SELECT COUNT(*) FROM usuarios")
     suspend fun contar(): Int

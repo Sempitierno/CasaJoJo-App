@@ -40,6 +40,7 @@ import cl.lacasajojo.app.data.entity.ProductoEntity
 import cl.lacasajojo.app.ui.components.DialogoConfirmacion
 import cl.lacasajojo.app.ui.components.EncabezadoCategoria
 import cl.lacasajojo.app.ui.components.EstadoVacio
+import cl.lacasajojo.app.ui.components.FotoMiniatura
 import cl.lacasajojo.app.ui.components.PantallaBase
 import cl.lacasajojo.app.ui.components.PantallaCargando
 import cl.lacasajojo.app.ui.components.TarjetaJoJo
@@ -156,6 +157,14 @@ private fun TarjetaProductoAdmin(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                if (producto.fotoProducto != null) {
+                    FotoMiniatura(
+                        nombreArchivo = producto.fotoProducto,
+                        contentDescription = "Foto de ${producto.nombre}",
+                        tamano = 48.dp,
+                        modifier = Modifier.padding(end = 12.dp)
+                    )
+                }
                 Text(
                     text = producto.nombre,
                     style = MaterialTheme.typography.titleMedium,

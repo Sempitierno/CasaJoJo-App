@@ -20,6 +20,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.remember
+import cl.lacasajojo.app.ui.components.TarjetaPerfil
+import cl.lacasajojo.app.ui.components.TarjetaUbicacion
+import cl.lacasajojo.app.ui.components.rememberAbrirMapas
+import cl.lacasajojo.app.ui.components.rememberSelectorFoto
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,6 +48,8 @@ import cl.lacasajojo.app.viewmodel.ClienteHomeViewModel
 @Composable
 fun ClienteHomeScreen(
     nombre: String,
+    fotoPerfil: String?,
+    onFotoPerfil: (String) -> Unit,
     viewModel: ClienteHomeViewModel,
     onMenu: () -> Unit,
     onNuevoPedido: () -> Unit,
@@ -71,8 +79,24 @@ fun ClienteHomeScreen(
         }
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    var mensajeCamara by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(mensajeCamara) {
+        mensajeCamara?.let { texto ->
+            snackbarHostState.showSnackbar(texto)
+            mensajeCamara = null
+        }
+    }
+    val abrirMapas = rememberAbrirMapas()
+    val abrirCamara = rememberSelectorFoto(
+        prefijo = "perfil",
+        onFotoLista = onFotoPerfil,
+        onError = { texto -> mensajeCamara = texto }
+    )
+
     PantallaBase(
         titulo = "La Casa JoJo",
+        snackbarHostState = snackbarHostState,
         acciones = {
             IconButton(onClick = { confirmarSalida = true }) {
                 Icon(
@@ -90,6 +114,12 @@ fun ClienteHomeScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            TarjetaPerfil(
+                nombre = nombre,
+                detalle = "Cliente",
+                fotoPerfil = fotoPerfil,
+                onTomarFoto = abrirCamara
+            )
             Text(
                 text = if (nombre.isBlank()) "Hola" else "Hola, $nombre",
                 style = MaterialTheme.typography.headlineSmall
@@ -100,6 +130,7 @@ fun ClienteHomeScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
+            TarjetaUbicacion(onVerMapa = abrirMapas)
             TarjetaAccion(
                 titulo = "Ver menú del día",
                 descripcion = "Platos, acompañamientos, ensaladas, postres y bebidas",

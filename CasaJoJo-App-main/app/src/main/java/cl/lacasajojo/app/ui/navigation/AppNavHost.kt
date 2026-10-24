@@ -107,6 +107,8 @@ fun AppNavHost(container: AppContainer) {
             )
             AdminHomeScreen(
                 nombre = (estadoSesion as? EstadoSesion.Activa)?.usuario?.nombreCompleto.orEmpty(),
+                fotoPerfil = (estadoSesion as? EstadoSesion.Activa)?.usuario?.fotoPerfil,
+                onFotoPerfil = sesionVm::guardarFotoPerfil,
                 viewModel = vm,
                 onMenu = { navController.navigate(Rutas.ADMIN_MENU) },
                 onPedidos = { navController.navigate(Rutas.ADMIN_PEDIDOS) },
@@ -168,6 +170,8 @@ fun AppNavHost(container: AppContainer) {
             )
             ClienteHomeScreen(
                 nombre = (estadoSesion as? EstadoSesion.Activa)?.usuario?.nombreCompleto.orEmpty(),
+                fotoPerfil = (estadoSesion as? EstadoSesion.Activa)?.usuario?.fotoPerfil,
+                onFotoPerfil = sesionVm::guardarFotoPerfil,
                 viewModel = vm,
                 onMenu = { navController.navigate(Rutas.CLIENTE_MENU) },
                 onNuevoPedido = { navController.navigate(Rutas.CLIENTE_NUEVO_PEDIDO) },

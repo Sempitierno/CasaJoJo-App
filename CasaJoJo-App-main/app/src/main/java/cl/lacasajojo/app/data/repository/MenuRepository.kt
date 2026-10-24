@@ -30,7 +30,8 @@ class MenuRepository(private val productoDao: ProductoDao) {
         descripcion: String,
         precioTexto: String,
         disponible: Boolean,
-        publicado: Boolean
+        publicado: Boolean,
+        fotoProducto: String? = null
     ): ProductoResultado {
         val errores = Validaciones.validarProducto(nombre, categoria, descripcion, precioTexto)
         val precio = precioTexto.trim().toIntOrNull()
@@ -44,7 +45,8 @@ class MenuRepository(private val productoDao: ProductoDao) {
             descripcion = descripcion.trim(),
             precio = precio,
             disponible = disponible,
-            publicado = publicado
+            publicado = publicado,
+            fotoProducto = fotoProducto
         )
         return try {
             if (id == 0L) {

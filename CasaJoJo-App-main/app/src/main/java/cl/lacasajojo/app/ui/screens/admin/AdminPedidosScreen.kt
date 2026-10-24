@@ -20,7 +20,15 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import cl.lacasajojo.app.ui.components.AvatarPerfil
+import cl.lacasajojo.app.ui.components.FotoPedido
+import cl.lacasajojo.app.ui.components.rememberSelectorFoto
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,7 +47,6 @@ import cl.lacasajojo.app.data.entity.PedidoConDetalle
 import cl.lacasajojo.app.ui.components.BotonPrincipal
 import cl.lacasajojo.app.ui.components.EstadoVacio
 import cl.lacasajojo.app.ui.components.EtiquetaEstado
-import cl.lacasajojo.app.ui.components.FilaDato
 import cl.lacasajojo.app.ui.components.LineaResumen
 import cl.lacasajojo.app.ui.components.LineaTotal
 import cl.lacasajojo.app.ui.components.PantallaBase
@@ -63,6 +70,14 @@ fun AdminPedidosScreen(
 ) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Una sola cámara para toda la lista: recuerda a qué pedido pertenece la foto que se está tomando.
+    var pedidoParaFoto by rememberSaveable { mutableStateOf<String?>(null) }
+    val abrirCamara = rememberSelectorFoto(
+        prefijo = "pedido",
+        onFotoLista = { nombre -> pedidoParaFoto?.let { id -> viewModel.guardarFoto(id, nombre) } },
+        onError = viewModel::avisar
+    )
 
     LaunchedEffect(Unit) {
         viewModel.mensajes.collect { mensaje -> snackbarHostState.showSnackbar(mensaje) }
@@ -120,7 +135,12 @@ fun AdminPedidosScreen(
                     items(ui.pedidos, key = { item -> item.pedido.id }) { item ->
                         TarjetaComanda(
                             item = item,
-                            onCambiarEstado = { nuevo -> viewModel.cambiarEstado(item.pedido, nuevo) }
+                            fotoCliente = ui.fotosClientes[item.pedido.clienteId],
+                            onCambiarEstado = { nuevo -> viewModel.cambiarEstado(item.pedido, nuevo) },
+                            onTomarFoto = {
+                                pedidoParaFoto = item.pedido.id
+                                abrirCamara()
+                            }
                         )
                     }
                 }
@@ -132,7 +152,9 @@ fun AdminPedidosScreen(
 @Composable
 private fun TarjetaComanda(
     item: PedidoConDetalle,
-    onCambiarEstado: (EstadoPedido) -> Unit
+    fotoCliente: String?,
+    onCambiarEstado: (EstadoPedido) -> Unit,
+    onTomarFoto: () -> Unit
 ) {
     val pedido = item.pedido
     val acento = colorAcentoEstado(pedido.estado)
@@ -172,8 +194,26 @@ private fun TarjetaComanda(
                 style = MaterialTheme.typography.titleLarge
             )
 
-            FilaDato(etiqueta = "Cliente", valor = pedido.clienteNombre)
-            FilaDato(etiqueta = "Correo", valor = pedido.clienteCorreo)
+            // Foto de perfil del cliente (o su inicial si no tiene) para reconocerlo al entregar el pedido.
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                AvatarPerfil(
+                    nombreArchivo = fotoCliente,
+                    nombre = pedido.clienteNombre,
+                    tamano = 56.dp
+                )
+                Column {
+                    Text(text = pedido.clienteNombre, style = MaterialTheme.typography.titleSmall)
+                    Text(
+                        text = pedido.clienteCorreo,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
 
             HorizontalDivider()
 
@@ -212,6 +252,17 @@ private fun TarjetaComanda(
             HorizontalDivider()
 
             LineaTotal(total = Formato.precio(pedido.total))
+
+            FotoPedido(
+                nombreArchivo = pedido.fotoPedido,
+                contentDescription = "Foto del pedido ${pedido.codigo}",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            )
+            OutlinedButton(onClick = onTomarFoto, modifier = Modifier.fillMaxWidth()) {
+                Text(text = if (pedido.fotoPedido == null) "Agregar foto del pedido" else "Cambiar foto del pedido")
+            }
 
             AccionesEstado(estado = pedido.estado, onCambiarEstado = onCambiarEstado)
         }

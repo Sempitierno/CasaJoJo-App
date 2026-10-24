@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Carpeta privada donde la cámara deja las fotos (filesDir/fotos). Solo se comparte con la app de cámara
+     mediante un URI temporal del FileProvider; nada queda accesible para otras apps. -->
+<paths>
+    <files-path name="fotos" path="fotos/" />
+</paths>

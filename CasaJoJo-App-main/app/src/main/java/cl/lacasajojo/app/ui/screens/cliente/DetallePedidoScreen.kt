@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -21,12 +22,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cl.lacasajojo.app.ui.components.EstadoVacio
 import cl.lacasajojo.app.ui.components.EtiquetaEstado
 import cl.lacasajojo.app.ui.components.FilaDato
+import cl.lacasajojo.app.ui.components.FotoPedido
 import cl.lacasajojo.app.ui.components.LineaResumen
 import cl.lacasajojo.app.ui.components.LineaTiempoEstado
 import cl.lacasajojo.app.ui.components.LineaTotal
 import cl.lacasajojo.app.ui.components.PantallaBase
 import cl.lacasajojo.app.ui.components.PantallaCargando
 import cl.lacasajojo.app.ui.components.TarjetaJoJo
+import cl.lacasajojo.app.ui.components.TarjetaRetiro
+import cl.lacasajojo.app.ui.components.rememberAbrirMapas
+import cl.lacasajojo.app.util.Ubicacion
 import cl.lacasajojo.app.util.Formato
 import cl.lacasajojo.app.util.codigo
 import cl.lacasajojo.app.util.detallesOrdenados
@@ -40,6 +45,7 @@ fun DetallePedidoScreen(
 ) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
     val item = ui.pedido
+    val abrirMapas = rememberAbrirMapas()
 
     PantallaBase(
         titulo = if (item == null) "Pedido" else "Pedido ${item.pedido.codigo}",
@@ -82,6 +88,29 @@ fun DetallePedidoScreen(
                             EtiquetaEstado(estado = item.pedido.estado)
                         }
                         LineaTiempoEstado(estadoActual = item.pedido.estado)
+                    }
+                }
+
+                // Desde que el pedido se empieza a preparar hasta que está listo: cómo llegar a retirarlo.
+                if (Ubicacion.mostrarEnPedido(item.pedido.estado)) {
+                    TarjetaRetiro(estado = item.pedido.estado, onVerUbicacion = abrirMapas)
+                }
+
+                if (item.pedido.fotoPedido != null) {
+                    TarjetaJoJo(modifier = Modifier.fillMaxWidth()) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(text = "Foto de tu pedido", style = MaterialTheme.typography.titleMedium)
+                            FotoPedido(
+                                nombreArchivo = item.pedido.fotoPedido,
+                                contentDescription = "Foto de tu pedido ${item.pedido.codigo}",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(220.dp)
+                            )
+                        }
                     }
                 }
 

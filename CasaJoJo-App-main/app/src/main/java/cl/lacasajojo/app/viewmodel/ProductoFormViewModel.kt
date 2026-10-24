@@ -24,6 +24,8 @@ data class ProductoFormUi(
     val precio: String = "",
     val disponible: Boolean = true,
     val publicado: Boolean = true,
+    /** Nombre del archivo de la foto del plato (null = sin foto). */
+    val foto: String? = null,
     val errores: ErroresProducto = ErroresProducto(),
     val guardando: Boolean = false,
     val guardado: Boolean = false,
@@ -56,7 +58,8 @@ class ProductoFormViewModel(
                             descripcion = producto.descripcion,
                             precio = producto.precio.toString(),
                             disponible = producto.disponible,
-                            publicado = producto.publicado
+                            publicado = producto.publicado,
+                            foto = producto.fotoProducto
                         )
                     }
                 }
@@ -98,6 +101,14 @@ class ProductoFormViewModel(
         _ui.update { it.copy(disponible = valor) }
     }
 
+    fun onFotoChange(nombreArchivo: String) {
+        _ui.update { it.copy(foto = nombreArchivo, mensajeError = null) }
+    }
+
+    fun onErrorCamara(mensaje: String) {
+        _ui.update { it.copy(mensajeError = mensaje) }
+    }
+
     fun onPublicadoChange(valor: Boolean) {
         _ui.update { it.copy(publicado = valor) }
     }
@@ -123,7 +134,8 @@ class ProductoFormViewModel(
                 descripcion = actual.descripcion,
                 precioTexto = actual.precio,
                 disponible = actual.disponible,
-                publicado = actual.publicado
+                publicado = actual.publicado,
+                fotoProducto = actual.foto
             )
             when (resultado) {
                 is ProductoResultado.Exito ->

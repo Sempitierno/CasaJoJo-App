@@ -14,6 +14,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import cl.lacasajojo.app.ui.components.TarjetaPerfil
+import cl.lacasajojo.app.ui.components.rememberSelectorFoto
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +36,8 @@ import cl.lacasajojo.app.viewmodel.AdminHomeViewModel
 @Composable
 fun AdminHomeScreen(
     nombre: String,
+    fotoPerfil: String?,
+    onFotoPerfil: (String) -> Unit,
     viewModel: AdminHomeViewModel,
     onMenu: () -> Unit,
     onPedidos: () -> Unit,
@@ -39,8 +46,23 @@ fun AdminHomeScreen(
     val ui by viewModel.ui.collectAsStateWithLifecycle()
     var confirmarSalida by rememberSaveable { mutableStateOf(false) }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    var mensajeCamara by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(mensajeCamara) {
+        mensajeCamara?.let { texto ->
+            snackbarHostState.showSnackbar(texto)
+            mensajeCamara = null
+        }
+    }
+    val abrirCamara = rememberSelectorFoto(
+        prefijo = "perfil",
+        onFotoLista = onFotoPerfil,
+        onError = { texto -> mensajeCamara = texto }
+    )
+
     PantallaBase(
         titulo = "Panel administrativo",
+        snackbarHostState = snackbarHostState,
         acciones = {
             IconButton(onClick = { confirmarSalida = true }) {
                 Icon(
@@ -58,6 +80,12 @@ fun AdminHomeScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            TarjetaPerfil(
+                nombre = nombre,
+                detalle = "Administrador",
+                fotoPerfil = fotoPerfil,
+                onTomarFoto = abrirCamara
+            )
             Text(
                 text = if (nombre.isBlank()) "Hola" else "Hola, $nombre",
                 style = MaterialTheme.typography.headlineSmall

@@ -87,12 +87,23 @@ class AuthRepository(
             }
             sesion.iniciar(usuario.id)
             return LoginResultado.Exito(
-                PerfilUsuario(usuario.id, usuario.nombreCompleto, usuario.correo, usuario.rol)
+                PerfilUsuario(usuario.id, usuario.nombreCompleto, usuario.correo, usuario.rol, usuario.fotoPerfil)
             )
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             return LoginResultado.Fallo("No se pudo iniciar sesión. Intenta nuevamente.")
+        }
+    }
+
+    /** Guarda la foto de perfil del usuario con la sesión iniciada. Devuelve true si se guardó. */
+    suspend fun cambiarFotoPerfil(usuarioId: Long, nombreArchivo: String): Boolean {
+        return try {
+            usuarioDao.actualizarFotoPerfil(usuarioId, nombreArchivo) > 0
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            false
         }
     }
 

@@ -34,6 +34,8 @@ import cl.lacasajojo.app.ui.components.FilaDato
 import cl.lacasajojo.app.ui.components.PantallaBase
 import cl.lacasajojo.app.ui.components.PantallaCargando
 import cl.lacasajojo.app.ui.components.TarjetaJoJo
+import cl.lacasajojo.app.ui.components.TarjetaUbicacion
+import cl.lacasajojo.app.ui.components.rememberAbrirMapas
 import cl.lacasajojo.app.util.Formato
 import cl.lacasajojo.app.util.codigo
 import cl.lacasajojo.app.viewmodel.DetallePedidoViewModel
@@ -47,6 +49,7 @@ fun PedidoConfirmadoScreen(
 ) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
     val item = ui.pedido
+    val abrirMapas = rememberAbrirMapas()
 
     PantallaBase(titulo = "Pedido confirmado") { innerPadding ->
         when {
@@ -120,6 +123,8 @@ fun PedidoConfirmadoScreen(
                         }
                     }
                 }
+
+                TarjetaUbicacion(onVerMapa = abrirMapas)
 
                 BotonPrincipal(texto = "Ver detalle del pedido", onClick = onVerDetalle)
                 OutlinedButton(

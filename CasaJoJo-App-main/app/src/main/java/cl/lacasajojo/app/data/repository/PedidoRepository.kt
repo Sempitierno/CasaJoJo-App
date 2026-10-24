@@ -10,6 +10,7 @@ import cl.lacasajojo.app.data.entity.PedidoEntity
 import cl.lacasajojo.app.util.Validaciones
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 /** Creación y consulta de pedidos (comandas) y cambios de estado. */
 class PedidoRepository(
@@ -20,6 +21,10 @@ class PedidoRepository(
 
     /** Todos los pedidos (administrador). */
     fun observarTodos(): Flow<List<PedidoConDetalle>> = pedidoDao.observarTodos()
+
+    /** Foto de perfil de cada cliente que tiene una: id del cliente -> nombre del archivo. */
+    fun observarFotosClientes(): Flow<Map<Long, String>> =
+        pedidoDao.observarFotosClientes().map { lista -> lista.associate { it.clienteId to it.fotoPerfil } }
 
     /** Solo los pedidos del cliente indicado. */
     fun observarDeCliente(clienteId: Long): Flow<List<PedidoConDetalle>> =
@@ -42,6 +47,17 @@ class PedidoRepository(
     suspend fun cambiarEstado(pedidoId: String, nuevoEstado: EstadoPedido): Boolean {
         return try {
             pedidoDao.actualizarEstado(pedidoId, nuevoEstado, reloj()) > 0
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    /** Asocia la foto tomada por el administrador a un pedido. Devuelve true si se guardó. */
+    suspend fun asignarFoto(pedidoId: String, nombreArchivo: String): Boolean {
+        return try {
+            pedidoDao.actualizarFoto(pedidoId, nombreArchivo, reloj()) > 0
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

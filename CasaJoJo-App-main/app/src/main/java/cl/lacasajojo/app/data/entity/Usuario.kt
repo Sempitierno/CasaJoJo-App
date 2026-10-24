@@ -15,7 +15,9 @@ data class UsuarioEntity(
     @ColumnInfo(collate = ColumnInfo.NOCASE) val correo: String,
     val rol: Rol,
     val claveHash: String,
-    val creadoEn: Long
+    val creadoEn: Long,
+    /** Nombre del archivo de la foto de perfil en el almacenamiento privado de la app (null = sin foto). */
+    val fotoPerfil: String? = null
 )
 
 /** Datos públicos del usuario para la interfaz (sin credenciales). Es una proyección de [UsuarioEntity]. */
@@ -23,5 +25,6 @@ data class PerfilUsuario(
     val id: Long,
     val nombreCompleto: String,
     val correo: String,
-    val rol: Rol
+    val rol: Rol,
+    val fotoPerfil: String? = null
 )

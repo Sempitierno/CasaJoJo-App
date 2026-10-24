@@ -3,6 +3,7 @@ package cl.lacasajojo.app.ui.screens.admin
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
@@ -28,6 +30,8 @@ import cl.lacasajojo.app.ui.components.CampoTexto
 import cl.lacasajojo.app.ui.components.EstadoVacio
 import cl.lacasajojo.app.ui.components.FilaInterruptor
 import cl.lacasajojo.app.ui.components.FilaOpcion
+import cl.lacasajojo.app.ui.components.FotoMiniatura
+import cl.lacasajojo.app.ui.components.rememberSelectorFoto
 import cl.lacasajojo.app.ui.components.MensajeError
 import cl.lacasajojo.app.ui.components.PantallaBase
 import cl.lacasajojo.app.ui.components.PantallaCargando
@@ -49,6 +53,12 @@ fun ProductoFormScreen(
             onVolver()
         }
     }
+
+    val abrirCamara = rememberSelectorFoto(
+        prefijo = "plato",
+        onFotoLista = viewModel::onFotoChange,
+        onError = viewModel::onErrorCamara
+    )
 
     PantallaBase(
         titulo = if (ui.esNuevo) "Nuevo producto" else "Editar producto",
@@ -76,6 +86,33 @@ fun ProductoFormScreen(
                     .padding(horizontal = 24.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                // La foto va primero, igual que la foto de perfil: es lo primero que se ve al crear el plato.
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    FotoMiniatura(
+                        nombreArchivo = ui.foto,
+                        contentDescription = "Foto del plato ${ui.nombre}",
+                        tamano = 112.dp
+                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(
+                            text = "Foto del plato",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            text = if (ui.foto == null) "Opcional. Los clientes la verán en el menú." else "Toca la foto para verla en grande.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        OutlinedButton(onClick = abrirCamara) {
+                            Text(text = if (ui.foto == null) "Agregar foto del plato" else "Cambiar foto")
+                        }
+                    }
+                }
+
                 CampoTexto(
                     valor = ui.nombre,
                     onValorChange = viewModel::onNombreChange,

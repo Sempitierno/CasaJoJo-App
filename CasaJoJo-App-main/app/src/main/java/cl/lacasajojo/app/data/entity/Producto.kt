@@ -18,5 +18,7 @@ data class ProductoEntity(
     val descripcion: String = "",
     val precio: Int,
     val disponible: Boolean = true,
-    val publicado: Boolean = true
+    val publicado: Boolean = true,
+    /** Nombre del archivo de la foto del plato (almacenamiento privado de la app); null = sin foto. */
+    val fotoProducto: String? = null
 )

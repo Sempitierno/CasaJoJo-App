@@ -25,7 +25,9 @@ data class PedidosAdminUi(
     /** Pedidos ya filtrados y ordenados para cocina. */
     val pedidos: List<PedidoConDetalle> = emptyList(),
     val conteos: Map<EstadoPedido, Int> = emptyMap(),
-    val total: Int = 0
+    val total: Int = 0,
+    /** Foto de perfil de cada cliente (id del cliente -> archivo); los que no tienen foto no aparecen. */
+    val fotosClientes: Map<Long, String> = emptyMap()
 )
 
 /** Comandas: lista todos los pedidos, permite filtrarlos por estado y cambiar su estado. */
@@ -38,8 +40,9 @@ class AdminPedidosViewModel(private val pedidosRepo: PedidoRepository) : ViewMod
 
     val ui: StateFlow<PedidosAdminUi> = combine(
         pedidosRepo.observarTodos(),
-        filtroSeleccionado
-    ) { pedidos, filtroActual ->
+        filtroSeleccionado,
+        pedidosRepo.observarFotosClientes()
+    ) { pedidos, filtroActual, fotos ->
         val ordenados = OrdenPedidos.paraCocina(pedidos)
         PedidosAdminUi(
             cargando = false,
@@ -52,12 +55,26 @@ class AdminPedidosViewModel(private val pedidosRepo: PedidoRepository) : ViewMod
             conteos = EstadoPedido.entries.associateWith { estado ->
                 pedidos.count { it.pedido.estado == estado }
             },
-            total = pedidos.size
+            total = pedidos.size,
+            fotosClientes = fotos
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PedidosAdminUi())
 
     fun filtrar(estado: EstadoPedido?) {
         filtroSeleccionado.value = estado
+    }
+
+    fun guardarFoto(pedidoId: String, nombreArchivo: String) {
+        viewModelScope.launch {
+            val guardado = pedidosRepo.asignarFoto(pedidoId, nombreArchivo)
+            canalMensajes.trySend(
+                if (guardado) "Foto del pedido guardada." else "No se pudo guardar la foto. Intenta nuevamente."
+            )
+        }
+    }
+
+    fun avisar(mensaje: String) {
+        canalMensajes.trySend(mensaje)
     }
 
     fun cambiarEstado(pedido: PedidoEntity, nuevoEstado: EstadoPedido) {

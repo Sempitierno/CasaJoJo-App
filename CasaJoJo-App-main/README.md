@@ -7,42 +7,24 @@ arman su combinación y eligen la hora de retiro, y la cocina ve las comandas es
 Proyecto académico — **DSY1105 · Desarrollo de Aplicaciones Móviles** (CITT Viña del Mar). Basado en el caso
 *"Gestión Digital de Comandas y Pedidos de Menú Diario"*.
 
+## Integrantes
+
+* Tomás Silva
+* Josafat Mencia
+* Felipe Oyarzo
+* Elias Teran
+
 **Tecnologías:** Kotlin · Jetpack Compose · Material Design 3 · MVVM · Room (SQLite) · Kotlin Coroutines y Flow ·
-Navigation Compose · selector de hora nativo de Android · notificaciones locales. Sin backend, sin Internet.
+Navigation Compose · animaciones de Compose (Canvas) · selector de hora nativo · notificaciones locales · cámara y
+galería del sistema · Google Maps. Sin backend: los datos se guardan en el dispositivo.
 
 ---
 
-## Estado de verificación (léase primero)
+## Estado del proyecto
 
-Este proyecto se generó en un entorno que **no tenía Android SDK, Gradle, compilador de Kotlin ni acceso a Internet**.
-Por eso, de forma explícita:
-
-| Aspecto | Estado |
-|---|---|
-| `./gradlew assembleDebug` (compilación) | **NO ejecutado.** La app **no está verificada como compilada**. |
-| Pruebas unitarias (`./gradlew test`) | **NO ejecutadas.** |
-| Pruebas instrumentadas (`connectedDebugAndroidTest`) | **NO ejecutadas.** |
-| Ejecución de la app en emulador o teléfono | **NO realizada.** |
-| Existencia de las versiones de dependencias en los repositorios Maven | **NO comprobada** (sin Internet). Se eligió una combinación estable y conocida (ver más abajo). |
-| Archivo `gradle/wrapper/gradle-wrapper.jar` | **No incluido** (es un binario que no pudo generarse offline). Ver sección *Gradle Wrapper*. |
-
-Lo que **sí** se hizo es una **revisión estática** (no equivale a una compilación):
-
-* Análisis léxico propio de los 68 archivos Kotlin: balance de `()`, `{}`, `[]`, cadenas y plantillas; `package` coherente con
-  cada carpeta; todos los `import` del proyecto resuelven a una declaración existente; ningún identificador usado sin
-  importar o declarar; sin clases duplicadas.
-* Coherencia entre declaraciones y usos: los argumentos con nombre de cada llamada coinciden con la firma real;
-  cada `viewModel.xxx` que usa una pantalla existe en su ViewModel; cada `ui.campo` existe en su clase de estado; todas
-  las rutas de navegación están registradas; los `R.*` y `@recurso` existen; los alias de `libs.versions.toml` coinciden
-  con los usados en los `build.gradle.kts`; todos los íconos usados están en `material-icons-core`.
-* Ejecución real (en una JVM) de la lógica que depende de APIs de Java y que usan las pruebas — expresión regular de
-  correo, formato de precios en CLP, formatos de fecha y hora, cálculo de la hora de retiro y hash PBKDF2 con
-  formatos inválidos — con 42 comprobaciones correctas.
-* Lectura manual de todo el código buscando errores de tipos, ámbitos de Compose, `smart cast` y uso de APIs.
-
-**Primer paso recomendado al recibir el proyecto:** abrirlo en Android Studio, sincronizar Gradle y ejecutar
-`assembleDebug` y `test`. Si aparece algún error de compilación o de sincronización, es un defecto de este proyecto
-(no un problema de su equipo): corríjalo o repórtelo con el mensaje exacto del error.
+* La aplicación **compila y se ejecuta** en Android Studio, probada en emulador y en un teléfono físico (Samsung).
+* Código fuente versionado en GitHub y tareas del equipo planificadas en Trello.
+* Pruebas unitarias en `app/src/test` y pruebas instrumentadas en `app/src/androidTest` (ver *Compilar y ejecutar las pruebas*).
 
 ---
 
@@ -67,6 +49,8 @@ Lo que **sí** se hizo es una **revisión estática** (no equivale a una compila
   contadores.
 * **Cambio de estado** con un botón: Recibido → En preparación → Listo para retiro (y posibilidad de volver atrás si
   hubo un error). Se guarda en Room al instante.
+* **Fotos:** foto de cada plato del menú y foto del pedido preparado, tomadas con la cámara o elegidas de la galería.
+* **Foto de perfil** del administrador.
 
 **Cliente**
 * **Menú publicado**, agrupado por categoría, con descripción, precio y disponibilidad. Los productos no disponibles
@@ -78,10 +62,32 @@ Lo que **sí** se hizo es una **revisión estática** (no equivale a una compila
 * **Historial** de pedidos propios y **detalle** de cada pedido con una línea de tiempo del estado.
 * Un cliente **solo puede ver sus propios pedidos** (la consulta filtra por su id).
 * **Notificaciones locales** cuando cambia el estado de un pedido (ver sección *Notificaciones*).
+* **Foto de perfil** (cámara o galería) y fotos de los platos en el menú; en el detalle del pedido puede ver la foto del
+  pedido preparado.
+* **Ubicación del local:** dirección escrita (El Álamo 408, Viña del Mar) y botón que abre la ubicación en Google Maps,
+  en el inicio, en la confirmación y en el detalle del pedido.
 
 Interfaz en español, precios en pesos chilenos (`$3.500`), estados de carga, mensajes de validación, estados vacíos,
 confirmaciones en acciones importantes (eliminar producto, cerrar sesión, confirmar pedido) y navegación correcta con el
 botón Atrás de Android. Tema claro y oscuro.
+
+### Recursos nativos del dispositivo
+
+| Recurso | Uso en la app |
+|---|---|
+| Selector de hora nativo (`TimePickerDialog`) | Elegir la hora de retiro del pedido. |
+| Notificaciones locales (`POST_NOTIFICATIONS`) | Avisar al cliente cuando su pedido cambia de estado. |
+| Cámara (`TakePicture` + `FileProvider`) | Foto de perfil, foto de los platos y foto del pedido preparado. |
+| Galería (selector de fotos del sistema, `PickVisualMedia`) | Elegir una foto existente en lugar de tomarla. |
+| Mapas (enlace a Google Maps) | Mostrar dónde queda el local para retirar el pedido. |
+
+### Animaciones
+
+* **Cacerola y sartén animadas** (dibujadas con Canvas, sin imágenes): la cacerola se mece mientras caen ingredientes y
+  sale vapor; la sartén salta sobre el fuego lanzando los ingredientes. Se alternan en la pantalla de bienvenida y en
+  cada espera: carga de listas, registro de usuario, envío del pedido a cocina y guardado de productos.
+* **Check animado con halo** al confirmar un pedido, como retroalimentación de éxito.
+* Componentes: `ui/components/CacerolaCargando.kt`, `ui/components/SartenCargando.kt` y `ui/components/Animaciones.kt`.
 
 ---
 
@@ -113,8 +119,9 @@ Si Gradle no pudiera resolver alguna versión, ajuste el número en `gradle/libs
 
 ## Cómo abrir y ejecutar la aplicación
 
-1. Descomprima `CasaJoJo_AndroidStudio.zip`. Quedará la carpeta `CasaJoJo`.
-2. En Android Studio: **File > Open** y seleccione la carpeta **`CasaJoJo`** (la que contiene `settings.gradle.kts`).
+1. Clone el repositorio: `git clone https://github.com/Sempitierno/CasaJoJo-App.git`
+2. En Android Studio: **File > Open** y seleccione la carpeta **`CasaJoJo-App-main`** (la que contiene
+   `settings.gradle.kts`).
 3. Espere la sincronización de Gradle. Si pide instalar *Android SDK Platform 35*, acepte. Si propone actualizar el
    Android Gradle Plugin, puede rechazarlo (el proyecto está configurado para la versión indicada).
 4. Elija un dispositivo (ver más abajo) y pulse **Run ▶**.
@@ -175,6 +182,7 @@ reemplazar por notificaciones push.
 * **Base de datos Room/SQLite** `casajojo.db`, en el almacenamiento privado de la app
   (`/data/data/cl.lacasajojo.app/databases/`). Tablas: `usuarios`, `productos`, `pedidos`, `detalles_pedido`.
   Para inspeccionarla use **View > Tool Windows > App Inspection > Database Inspector** con la app en ejecución.
+* **Fotos:** en la carpeta privada de la app (`files/fotos`); la base de datos guarda solo el nombre del archivo.
 * **SharedPreferences** `sesion_casajojo`: guarda únicamente el *id* del usuario con la sesión iniciada (ninguna
   credencial ni dato personal).
 * Todo es local: no se envía nada a Internet y `allowBackup` está desactivado (la base de datos tampoco va a las
@@ -212,7 +220,7 @@ UI (Compose)  ──►  ViewModel  ──►  Repository  ──►  DAO (Room)
 * Cada pantalla tiene su ViewModel ligado a su entrada de navegación; al cerrar sesión se vacía la pila.
 
 ```
-CasaJoJo/
+CasaJoJo-App-main/
 ├── settings.gradle.kts · build.gradle.kts · gradle.properties · gradlew · gradlew.bat
 ├── gradle/ (libs.versions.toml, wrapper/gradle-wrapper.properties)
 └── app/
@@ -249,8 +257,9 @@ CasaJoJo/
 | `pedidos` | `id` (PK, **UUID** único), `clienteId` (FK a `usuarios`), copia del nombre y correo del cliente, `creadoEn`, `horaRetiro`, especificaciones, `total`, `estado`, `estadoNotificado`, `actualizadoEn`. |
 | `detalles_pedido` | `id` (PK), `pedidoId` (FK a `pedidos`, borrado en cascada), categoría, `productoId` (referencia informativa, sin FK), **nombre y precio del producto al pedir**. |
 
-Borrar o editar un producto **no** toca los pedidos (no hay clave foránea hacia `productos`). La base se crea en la
-versión 1; el esquema se exporta a `app/schemas/` para escribir migraciones en el futuro, y se evita
+Borrar o editar un producto **no** toca los pedidos (no hay clave foránea hacia `productos`). La base se creó en la
+versión 1 y hoy está en la **versión 3**, con migraciones que conservan los datos: 1→2 agrega `fotoPerfil` (usuarios) y
+`fotoPedido` (pedidos); 2→3 agrega `fotoProducto` (productos). El esquema se exporta a `app/schemas/` y se evita
 `fallbackToDestructiveMigration` para no borrar pedidos de forma silenciosa.
 
 ### Reglas de negocio y decisiones de diseño
@@ -285,12 +294,12 @@ Informes de resultados: `app/build/reports/tests/testDebugUnitTest/index.html` y
 
 ### Qué cubren las pruebas
 
-**Unitarias (50, en JVM):** formato de precios en CLP y de fechas; validaciones de registro, inicio de sesión, productos y
+**Unitarias (en JVM):** formato de precios en CLP y de fechas; validaciones de registro, inicio de sesión, productos y
 pedidos (correo, contraseñas, rol obligatorio, precios, hora de retiro); hash de contraseñas (no se guarda en texto plano,
 verificación correcta e incorrecta, formatos inválidos, sal distinta); orden de las comandas para cocina; transiciones de
-estado; total del pedido y reglas para poder confirmar.
+estado; total del pedido y reglas para poder confirmar; manejo de fotos y datos de ubicación del local.
 
-**Instrumentadas (30, con Room real):**
+**Instrumentadas (con Room real):**
 
 | Requisito del enunciado | Prueba |
 |---|---|
@@ -306,6 +315,7 @@ estado; total del pedido y reglas para poder confirmar.
 | Cambio de estado y que lo vea el cliente | `el_administrador_cambia_el_estado_y_el_cliente_lo_ve` |
 | Separación de pedidos por usuario | `cada_cliente_solo_ve_sus_propios_pedidos` |
 | Pedido duplicado por pulsación repetida | `una_pulsacion_repetida_no_duplica_el_pedido` |
+| Fotos de perfil, platos y pedidos | `FotosInstrumentedTest` |
 
 Las pantallas (Compose) no tienen pruebas automáticas de interfaz; para ellas use esta **lista de verificación manual**:
 registro con datos inválidos (cada mensaje de error) · correo duplicado con otras mayúsculas · inicio de sesión
@@ -320,13 +330,12 @@ pantalla durante el formulario de pedido.
 ## Alcance respecto del caso
 
 Esta primera versión implementa lo pedido para el prototipo local. **Quedan fuera, a propósito:** backend de administración
-(Spring Boot) e integración con Retrofit/API REST, Firebase o nube, APK firmado en modo *release*, repositorio Git y tablero
-Trello. La arquitectura facilita agregarlos después: todo el acceso a datos pasa por los repositorios (se podría añadir
+(Spring Boot) e integración con Retrofit/API REST, Firebase o nube y APK firmado en modo *release* (corresponden a la
+Unidad 3). La arquitectura facilita agregarlos después: todo el acceso a datos pasa por los repositorios (se podría añadir
 una fuente remota sin tocar las pantallas) y los pedidos ya usan identificadores UUID generados en el cliente.
 
 ## Limitaciones conocidas
 
-* No verificado en compilación ni en ejecución (ver *Estado de verificación*).
 * Un solo dispositivo: administrador y cliente no se comunican entre teléfonos distintos (no hay backend).
 * Las notificaciones aparecen cuando la sesión del cliente está activa en el dispositivo (ver *Notificaciones locales*).
 * La pantalla de comandas no tiene búsqueda ni filtro por fecha; los pedidos antiguos permanecen en la lista.

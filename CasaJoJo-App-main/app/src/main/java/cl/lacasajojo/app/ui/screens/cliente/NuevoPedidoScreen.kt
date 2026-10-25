@@ -1,6 +1,8 @@
 package cl.lacasajojo.app.ui.screens.cliente
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -21,6 +23,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -35,6 +38,7 @@ import cl.lacasajojo.app.ui.components.FilaOpcion
 import cl.lacasajojo.app.ui.components.LineaResumen
 import cl.lacasajojo.app.ui.components.LineaTotal
 import cl.lacasajojo.app.ui.components.MensajeError
+import cl.lacasajojo.app.ui.components.AnimacionCargaAlternada
 import cl.lacasajojo.app.ui.components.PantallaBase
 import cl.lacasajojo.app.ui.components.PantallaCargando
 import cl.lacasajojo.app.ui.components.SelectorHoraRetiro
@@ -75,12 +79,23 @@ fun NuevoPedidoScreen(
         }
     }
 
-    if (ui.mostrarResumen) {
+    if (ui.mostrarResumen && !ui.enviando) {
         DialogoResumenPedido(
             ui = ui,
             onConfirmar = viewModel::confirmar,
             onVolver = viewModel::cancelarConfirmacion
         )
+    }
+
+    if (ui.enviando) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.95f)),
+            contentAlignment = Alignment.Center
+        ) {
+            AnimacionCargaAlternada(mensaje = "Enviando a la cocina", tamano = 160.dp)
+        }
     }
 }
 
@@ -251,7 +266,7 @@ private fun DialogoResumenPedido(
     onVolver: () -> Unit
 ) {
     AlertDialog(
-        onDismissRequest = { if (!ui.enviando) onVolver() },
+        onDismissRequest = onVolver,
         title = { Text(text = "Confirmar pedido") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -278,12 +293,12 @@ private fun DialogoResumenPedido(
             }
         },
         confirmButton = {
-            Button(onClick = onConfirmar, enabled = !ui.enviando) {
-                Text(text = if (ui.enviando) "Enviando…" else "Confirmar pedido")
+            Button(onClick = onConfirmar) {
+                Text(text = "Confirmar pedido")
             }
         },
         dismissButton = {
-            TextButton(onClick = onVolver, enabled = !ui.enviando) {
+            TextButton(onClick = onVolver) {
                 Text(text = "Volver")
             }
         }

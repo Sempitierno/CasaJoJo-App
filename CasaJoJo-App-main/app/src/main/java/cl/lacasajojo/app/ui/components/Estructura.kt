@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -93,11 +92,11 @@ fun PantallaBase(
     )
 }
 
-/** Indicador de carga centrado (estado de carga de las listas). */
+/** Indicador de carga centrado que alterna la animación de sartén y cacerola. */
 @Composable
-fun PantallaCargando(modifier: Modifier = Modifier) {
+fun PantallaCargando(modifier: Modifier = Modifier, mensaje: String = "Cocinando") {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
+        AnimacionCargaAlternada(mensaje = mensaje)
     }
 }
 

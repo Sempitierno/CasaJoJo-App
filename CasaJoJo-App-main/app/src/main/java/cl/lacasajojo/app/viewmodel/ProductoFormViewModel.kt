@@ -127,6 +127,7 @@ class ProductoFormViewModel(
 
         _ui.update { it.copy(guardando = true, mensajeError = null) }
         viewModelScope.launch {
+            kotlinx.coroutines.delay(3000)
             val resultado = menu.guardar(
                 id = productoId,
                 nombre = actual.nombre,

@@ -179,6 +179,9 @@ class NuevoPedidoViewModel(
         entrada.update { it.copy(enviando = true, errorGeneral = null) }
 
         viewModelScope.launch {
+            // Pausa de 3 segundos para que se luzca la animación al confirmar
+            kotlinx.coroutines.delay(3000)
+
             val cliente = auth.usuarioActual.first()
             if (cliente == null) {
                 entrada.update {

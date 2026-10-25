@@ -65,7 +65,10 @@ fun ProductoFormScreen(
         onAtras = onVolver
     ) { innerPadding ->
         when {
-            ui.cargando -> PantallaCargando(modifier = Modifier.padding(innerPadding))
+            ui.cargando || ui.guardando -> PantallaCargando(
+                modifier = Modifier.padding(innerPadding),
+                mensaje = if (ui.guardando) "Guardando plato" else "Cargando"
+            )
             ui.noEncontrado -> EstadoVacio(
                 modifier = Modifier.padding(innerPadding),
                 titulo = "Producto no encontrado",

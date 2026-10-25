@@ -1,6 +1,8 @@
 package cl.lacasajojo.app.ui.screens.auth
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,12 +16,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cl.lacasajojo.app.data.entity.Rol
+import cl.lacasajojo.app.ui.components.AnimacionCargaAlternada
 import cl.lacasajojo.app.ui.components.BotonPrincipal
 import cl.lacasajojo.app.ui.components.CampoClave
 import cl.lacasajojo.app.ui.components.CampoTexto
@@ -37,16 +41,27 @@ fun RegistroScreen(
     val ui by viewModel.ui.collectAsStateWithLifecycle()
 
     PantallaBase(titulo = "Crear cuenta", onAtras = onVolver) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-                .imePadding()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        if (ui.cargando) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .background(MaterialTheme.colorScheme.background),
+                contentAlignment = Alignment.Center
+            ) {
+                AnimacionCargaAlternada(mensaje = "Creando cuenta de usuario", tamano = 160.dp)
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .imePadding()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
             CampoTexto(
                 valor = ui.nombre,
                 onValorChange = viewModel::onNombreChange,
@@ -113,6 +128,7 @@ fun RegistroScreen(
                 modifier = Modifier.padding(top = 8.dp)
             )
         }
+      }
     }
 
     if (ui.registrado) {

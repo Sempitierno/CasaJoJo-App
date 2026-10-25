@@ -31,6 +31,7 @@ import cl.lacasajojo.app.ui.components.BotonPrincipal
 import cl.lacasajojo.app.ui.components.EstadoVacio
 import cl.lacasajojo.app.ui.components.EtiquetaEstado
 import cl.lacasajojo.app.ui.components.FilaDato
+import cl.lacasajojo.app.ui.components.IconoExitoAnimado
 import cl.lacasajojo.app.ui.components.PantallaBase
 import cl.lacasajojo.app.ui.components.PantallaCargando
 import cl.lacasajojo.app.ui.components.TarjetaJoJo
@@ -73,19 +74,7 @@ fun PedidoConfirmadoScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(88.dp)
-                        .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Check,
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp),
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
+                IconoExitoAnimado()
                 Text(
                     text = "¡Pedido confirmado!",
                     style = MaterialTheme.typography.headlineSmall,

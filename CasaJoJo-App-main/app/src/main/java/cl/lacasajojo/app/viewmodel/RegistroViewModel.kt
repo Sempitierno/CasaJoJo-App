@@ -69,6 +69,7 @@ class RegistroViewModel(private val auth: AuthRepository) : ViewModel() {
 
         _ui.update { it.copy(cargando = true, errores = ErroresRegistro()) }
         viewModelScope.launch {
+            kotlinx.coroutines.delay(3000)
             val resultado = auth.registrar(
                 actual.nombre, actual.correo, actual.password, actual.confirmacion, actual.rol
             )
